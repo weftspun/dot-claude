@@ -186,7 +186,6 @@ Sources excluded from corpora, with the reason:
 | **OpenRAIL-M** as a *generator* | use-restrictions propagate into anything trained on the output — **passthrough use is exempt**, see below |
 | **FLUX.1** | the conditionable half is non-commercial; the permissive half cannot be conditioned — see below |
 | generators with no licence-clean **depth** control | HiDream-I1, SANA — see below |
-| **Kolors** | licence-clean and unexercised — ~150 downloads on its depth control is no QA at all |
 | **hosted-API generators** as a corpus source | Nano-banana / Gemini and any API-only model — condition 1 cannot be satisfied without a checkpoint, see below |
 | DeepFashion | re-export of a research-only corpus |
 | AddBiomechanics `.b3d` as an identity source | lab volunteers — narrow and inequitable population |
@@ -257,12 +256,31 @@ Three clear at the time of writing, all Apache-2.0 in base *and* control:
 
 * **Qwen-Image** — a union plus a dedicated depth model, from several independent maintainers.
 * **Z-Image-Turbo** — union, `alibaba-pai`.
-**Kolors is blocklisted, and it is the interesting exclusion.** It is the only candidate that
-cleared every licence test outright — Apache-2.0 base, `Kwai-Kolors/Kolors-ControlNet-Depth`
-Apache-2.0 and published by the model's own authors — and it is excluded anyway, because
-~150 downloads on that depth control is not a track record. A heavily used model arrives with
-a year of other people's QA already done; an unused one hands that bill to us, on the one
-component the whole pipeline depends on. Licence-clean is necessary and it is not sufficient.
+**Kolors is not blocklisted, and its position is precise.** It is the only from-scratch,
+Apache-2.0, SDXL-architecture model with its own ControlNets — trained by Kwai with a ChatGLM
+text encoder, so it carries no SDXL weight lineage and none of OpenRAIL's terms. Architecture
+similarity is not licence inheritance, and the converse holds too: relabelling an SDXL
+*derivative* as Apache-2.0 does not shed OpenRAIL++'s use restrictions, which is what makes
+`segmind/SSD-1B` a trap rather than an alternative.
+
+Two measurements bound what it can do, and both were taken rather than assumed.
+
+**It cannot borrow SDXL's ControlNet ecosystem.** `xinsir/controlnet-union-sdxl-1.0` and
+`-depth-sdxl-1.0` are Apache-2.0 and heavily exercised — 112,265 and 17,763 downloads — so
+pairing one with Kolors would have solved the exposure problem outright. Comparing configs
+says no: `cross_attention_dim`, `block_out_channels` and `transformer_layers_per_block` all
+match, and two things do not. Kolors' `projection_class_embeddings_input_dim` is **5632**
+against SDXL's **2816** — exactly double, because ChatGLM's pooled embedding is larger — and
+Kolors carries `encoder_hid_dim` 4096 for its 4096→2048 projection where the SDXL ControlNet
+has `None`. The shapes disagree, so the load fails rather than degrades.
+
+**And its ControlNets are off the standard path.** `Kolors-ControlNet-Depth` declares
+`_class_name: ControlNetModel_JQ`, a bespoke class, and diffusers has no `controlnet_kolors.py`
+— so using it means Kwai's own inference code, not stock diffusers.
+
+So Kolors is available and carries a real cost: ~150 downloads on its depth control, plus a
+non-standard code path. That is a fallback to reach for deliberately, not a peer of the
+exercised options.
 
 **The consequence, stated rather than left implicit: nothing non-Alibaba clears.** Qwen-Image
 and Z-Image-Turbo are the same house in base and control alike — Qwen team and Tongyi-MAI,
