@@ -224,8 +224,21 @@ Three clear at the time of writing, all Apache-2.0 in base *and* control:
 * **Kolors** — `Kwai-Kolors/Kolors-ControlNet-Depth`, published by the model's own authors.
   Kolors uses an SDXL-shaped architecture but was trained from scratch with a ChatGLM text
   encoder, so it carries no SDXL weight lineage and none of OpenRAIL's terms; architecture
-  similarity is not licence inheritance. Thinly exercised though — the depth control has ~150
-  downloads against Qwen's thousands.
+  similarity is not licence inheritance.
+
+**Exposure against independence, which is the real trade here.** The depth control has ~150
+downloads against Qwen's thousands, so nobody has found its failure modes on our behalf — a
+heavily used model arrives with a year of other people's QA, and this one does not.
+
+Set against that: **Qwen-Image and Z-Image-Turbo are both Alibaba**, base and control alike —
+Qwen team and Tongyi-MAI, with `alibaba-pai` publishing controls for both. So "two clear
+options" overstates it, in the same way three COCO-trained estimators looked like three
+opinions and were one. Kolors is the only candidate from a different house (Kwai), and that is
+what it buys.
+
+Default to the exercised pair for volume work. Reach for Kolors when a result needs checking
+against a generator that shares no lineage with the one that produced it — and expect to do
+its QA yourself.
 
 Kolors also proves the point above from inside one organisation: `Kolors-ControlNet-Depth` and
 `-Canny` are tagged Apache-2.0 while `-Canny`'s sibling `Kolors-ControlNet-Pose` carries **no
