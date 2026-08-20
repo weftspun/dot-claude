@@ -64,6 +64,28 @@ is distribution collapse, not generation per se. The four conditions above are t
 written out. `EasyDiffusion outputs` and `seethrough PSDs` stay blocklisted below — those are
 secondary generation with no recorded provenance, which is condition 1 failing.
 
+**The blinded holdout.** `dataflow-coco-gemx/coco_person_commercial_val2017` — 523
+license-filtered COCO person images — is a **blinded** validation set. Blinded means more than
+unused for gradient steps: it is not inspected while developing, not used to pick a checkpoint,
+a hyperparameter, a threshold, or a stopping point, and not looked at to decide whether an
+approach is working. A holdout consulted repeatedly during development has been trained on by
+hand, just slowly.
+
+It is real photographs, so it satisfies condition 4 above where a generated set would not. That
+is precisely why it is worth protecting.
+
+Two corollaries that are easy to violate without noticing:
+
+* **Never generate from it.** If train2017 feeds a generation pipeline, val2017 must not — an
+  image generated from a held-out photo carries that photo's content into training.
+* **Anything derived from val2017 inherits its status.** The COCO-OOD stylized sets
+  (`6-datasource/coco-ood-eval`) are val2017 restyled, so they are evaluation-only twice over:
+  derived from the holdout, and generated.
+
+Real photographs validate the pose pipeline, not the layer-decomposition task — a photograph
+has no ground-truth `front hair` / `back hair` split. Validating See-Through itself still needs
+held-out illustrations, and this set does not supply them.
+
 **Deployment.** glTF exports carry **pure data only** — skin weights, animation samplers,
 morph targets. No runtime modifiers, drivers, constraints, or custom extensions. An export
 that only looks right because the consumer runs our code is not portable.
