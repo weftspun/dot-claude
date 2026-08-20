@@ -185,7 +185,8 @@ Sources excluded from corpora, with the reason:
 | CC-BY-SA | share-alike exposure |
 | **OpenRAIL-M** as a *generator* | use-restrictions propagate into anything trained on the output — **passthrough use is exempt**, see below |
 | **FLUX.1** | the conditionable half is non-commercial; the permissive half cannot be conditioned — see below |
-| generators with no licence-clean **depth** control | HiDream-I1 (MIT, no ControlNet), SANA (Apache-2.0, HED only) — see below |
+| generators with no licence-clean **depth** control | HiDream-I1, SANA — see below |
+| **Kolors** | licence-clean and unexercised — ~150 downloads on its depth control is no QA at all |
 | DeepFashion | re-export of a research-only corpus |
 | AddBiomechanics `.b3d` as an identity source | lab volunteers — narrow and inequitable population |
 | `caldata_*_jc.parquet` | pre-cut derivatives; use originals |
@@ -221,24 +222,23 @@ Three clear at the time of writing, all Apache-2.0 in base *and* control:
 
 * **Qwen-Image** — a union plus a dedicated depth model, from several independent maintainers.
 * **Z-Image-Turbo** — union, `alibaba-pai`.
-* **Kolors** — `Kwai-Kolors/Kolors-ControlNet-Depth`, published by the model's own authors.
-  Kolors uses an SDXL-shaped architecture but was trained from scratch with a ChatGLM text
-  encoder, so it carries no SDXL weight lineage and none of OpenRAIL's terms; architecture
-  similarity is not licence inheritance.
+**Kolors is blocklisted, and it is the interesting exclusion.** It is the only candidate that
+cleared every licence test outright — Apache-2.0 base, `Kwai-Kolors/Kolors-ControlNet-Depth`
+Apache-2.0 and published by the model's own authors — and it is excluded anyway, because
+~150 downloads on that depth control is not a track record. A heavily used model arrives with
+a year of other people's QA already done; an unused one hands that bill to us, on the one
+component the whole pipeline depends on. Licence-clean is necessary and it is not sufficient.
 
-**Exposure against independence, which is the real trade here.** The depth control has ~150
-downloads against Qwen's thousands, so nobody has found its failure modes on our behalf — a
-heavily used model arrives with a year of other people's QA, and this one does not.
+**The consequence, stated rather than left implicit: nothing non-Alibaba clears.** Qwen-Image
+and Z-Image-Turbo are the same house in base and control alike — Qwen team and Tongyi-MAI,
+with `alibaba-pai` publishing controls for both. So the two remaining options are one lineage
+wearing two names, in the same way three COCO-trained estimators looked like three opinions
+and were one. Kolors was the only different house (Kwai), and dropping it leaves the
+common-mode exposure unaddressed rather than solved.
 
-Set against that: **Qwen-Image and Z-Image-Turbo are both Alibaba**, base and control alike —
-Qwen team and Tongyi-MAI, with `alibaba-pai` publishing controls for both. So "two clear
-options" overstates it, in the same way three COCO-trained estimators looked like three
-opinions and were one. Kolors is the only candidate from a different house (Kwai), and that is
-what it buys.
-
-Default to the exercised pair for volume work. Reach for Kolors when a result needs checking
-against a generator that shares no lineage with the one that produced it — and expect to do
-its QA yourself.
+That is an accepted risk, not an absent one. If a corpus later needs cross-checking against a
+generator sharing no lineage with the one that produced it, this is the gap it will run into,
+and the answer will be to qualify a new candidate rather than to rediscover that none exists.
 
 Kolors also proves the point above from inside one organisation: `Kolors-ControlNet-Depth` and
 `-Canny` are tagged Apache-2.0 while `-Canny`'s sibling `Kolors-ControlNet-Pose` carries **no
