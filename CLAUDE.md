@@ -94,8 +94,32 @@ that only looks right because the consumer runs our code is not portable.
 are approved. Note DDM bakes the smoothing but not the pose dependence, so it suits renders
 and baked clips and is not an option for live avatars.
 
-**Pose sources.** From ANNY/SOMA's own pose library or synthetic. No scraped or third-party
-pose references.
+**Pose sources.** From ANNY/SOMA's own pose library, synthetic, or a licence-clean third-party
+motion set. No scraped or unlicensed pose references.
+
+The old wording read "no scraped or third-party pose references", and it was too coarse in the
+same way the synthetic ban was. Its three targets — CMU (provenance), Mixamo (licensing),
+posemaniacs (scraping) — are each a licence or provenance failure, so "third-party" was
+standing in for "unlicensed third-party". As written it also excluded CC-BY-4.0 mocap with
+clean citation metadata, which is not the hazard and never was.
+
+Two axes decide it, and both must hold.
+
+**Licence.** The set carries a readable licence permitting commercial use and derivatives —
+the same bar `filter_coco_licenses.py` applies to images. `CITATION.cff` alongside the data,
+naming the licence and the source record, is the evidence. A set behind a registration form is
+not licence-clean: terms that cannot be read without accepting them cannot be gated on.
+
+**Role.** A pose may be used as a **control** — conditioning a generation whose output is then
+verified back against the pose it was given — or retargeted into an asset we ship. The first
+is transient: the pose shapes a render and the check confirms the body matches. The second
+embeds someone else's motion in a deliverable, which is what the rule was written to stop.
+Control use is permitted for licence-clean sets; shipping retargeted third-party motion is not,
+whatever the licence.
+
+The verification is not optional decoration. A pose used as a control and never checked is a
+pose we assumed was followed, and `pose-consensus`'s referee exists to do that checking —
+fit the generated result and confirm the body matches the pose that conditioned it.
 
 **Latents.** Stages pass latents; VAE decode happens once, at final output. Never
 `encode(decode(z))`.
