@@ -35,8 +35,34 @@ satellite relations rather than nullable columns, **no NULLs**, no derivable col
 value like `-1` for "no parent" is a value; a NULL is not.
 
 **Data hygiene.** Training data only — validation and test splits are strictly held out from
-training, tuning, and selection. Generative-model outputs never enter training corpora; that
-is a quality rule, not a licensing one.
+training, tuning, and selection.
+
+Synthetic data is two classes, and the distinction is the whole rule:
+
+*Constructed* synthetic is **rendered deterministically from source assets we hold** — Live2D
+drawables, ANNY rigs, BVH poses. The labels are true by construction rather than inferred, the
+same seed reproduces the corpus, and nothing was sampled from a learned distribution. This is
+ordinary training data and always has been; `syn_data.py`'s Live2D renders are the reference
+case.
+
+*Generated* synthetic is **sampled from a generative model** — diffusion outputs, GAN style
+transfer, a teacher's predictions. Permitted in a training corpus only when all four hold:
+
+1. the generating model, checkpoint and prompt/conditioning are recorded with the data, so the
+   corpus can be regenerated and its provenance answered later;
+2. it is stored and manifested separately from constructed and real data, never merged into an
+   undifferentiated pool;
+3. it is not the sole distribution for a model that will be deployed on real inputs — mix in
+   real or constructed data, because the failure this rule exists to prevent is a student that
+   is excellent on its teacher's output and mediocre on the world;
+4. evaluation uses real or constructed data only. A model measured on its own generation
+   distribution has not been measured.
+
+The old blanket ban read "generative-model outputs never enter training corpora". It was too
+coarse: it forbade legitimate distillation while saying nothing about the actual hazard, which
+is distribution collapse, not generation per se. The four conditions above are that hazard
+written out. `EasyDiffusion outputs` and `seethrough PSDs` stay blocklisted below — those are
+secondary generation with no recorded provenance, which is condition 1 failing.
 
 **Deployment.** glTF exports carry **pure data only** — skin weights, animation samplers,
 morph targets. No runtime modifiers, drivers, constraints, or custom extensions. An export
