@@ -163,9 +163,23 @@ Sources excluded from corpora, with the reason:
 | AddBiomechanics `.b3d` as an identity source | lab volunteers — narrow and inequitable population |
 | `caldata_*_jc.parquet` | pre-cut derivatives; use originals |
 | EasyDiffusion outputs, seethrough PSDs | secondary generation |
+| `alfredplpl/anime-with-caption-cc0` | hand quality — malformed hands throughout |
 
 `O:\Documents\Datasets\cosplay_photo_library` may be used for **validation only**, never
 training.
+
+The `anime-with-caption-cc0` entry is a **quality** exclusion, not a licensing one — the
+licence is CC0 and could not be cleaner. Hands are malformed across the set, and `handwear` is
+one of the 24 body-part tags See-Through must separate, so the defect lands directly on a
+supervised output rather than somewhere harmless. A corpus that is free to use and wrong about
+the thing being learned is worse than one that is merely encumbered.
+
+One consequence to keep straight: `seethrough-ggml/art/concept/anime_with_caption_cc0_0023.jpg`
+comes from this dataset and is the reference input for every timing in MADR 0010/0011/0013 and
+the optimization ladder. Those measurements stay valid — a benchmark input needs to be fixed
+and representative, not defect-free, and re-basing them would discard the comparability that
+makes them a ladder. The exclusion is on *training*, not on that one image's continued use as a
+stopwatch.
 
 
 ## What belongs here
