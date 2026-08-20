@@ -9,3 +9,7 @@ settings.local.json
 
 .DS_Store
 __pycache__/
+
+# Runtime lock, written by the scheduler while a session is live. Machine-local and
+# transient -- tracking it would commit one desk's in-flight state to everybody.
+scheduled_tasks.lock

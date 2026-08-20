@@ -163,7 +163,7 @@ Sources excluded from corpora, with the reason:
 | AddBiomechanics `.b3d` as an identity source | lab volunteers — narrow and inequitable population |
 | `caldata_*_jc.parquet` | pre-cut derivatives; use originals |
 | EasyDiffusion outputs, seethrough PSDs | secondary generation |
-| `alfredplpl/anime-with-caption-cc0` | hand quality — malformed hands throughout |
+| `alfredplpl/anime-with-caption-cc0` | hand quality — **images** blocked, captions permitted |
 
 `O:\Documents\Datasets\cosplay_photo_library` may be used for **validation only**, never
 training.
@@ -173,6 +173,23 @@ licence is CC0 and could not be cleaner. Hands are malformed across the set, and
 one of the 24 body-part tags See-Through must separate, so the defect lands directly on a
 supervised output rather than somewhere harmless. A corpus that is free to use and wrong about
 the thing being learned is worse than one that is merely encumbered.
+
+**The captions are separable from the images, and they are not excluded.** The defect is in the
+pixels: hands are drawn wrong. A caption is text, and carries none of it. So the entry blocks
+the *images* and permits the *captions*, which may be reused as prompt conditioning — the
+intended use is generation where ANNY supplies the shape and the caption supplies the language,
+so no pixel from this dataset reaches the corpus.
+
+That split is worth stating rather than leaving to judgement, because the two obvious readings
+are both wrong. Blocking the captions too would discard clean CC0 text over a defect it does
+not contain; unblocking the dataset because "we only wanted the captions anyway" would leave
+the images available to whoever reads the entry next.
+
+One consequence of permitting the captions: a generator prompted by them still draws its own
+hands, and SDXL hands are a known weak point. Excluding a corpus for malformed hands and then
+generating a replacement with a model that malforms them differently is not an improvement, it
+is the same defect with our provenance on it. Hand quality in generated output is therefore
+measured — `pose-consensus`'s finger-chain gate exists for this — before any volume run.
 
 One consequence to keep straight: `seethrough-ggml/art/concept/anime_with_caption_cc0_0023.jpg`
 comes from this dataset and is the reference input for every timing in MADR 0010/0011/0013 and
