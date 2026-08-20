@@ -217,9 +217,20 @@ looking attractive:
   a training job, not adopted as-is.
 * **FLUX.1** fails a third way, below.
 
-Two clear at the time of writing: **Qwen-Image** (union plus a dedicated depth model, several
-independent maintainers) and **Z-Image-Turbo** (union, `alibaba-pai`). Both Apache-2.0 in base
-and control.
+Three clear at the time of writing, all Apache-2.0 in base *and* control:
+
+* **Qwen-Image** — a union plus a dedicated depth model, from several independent maintainers.
+* **Z-Image-Turbo** — union, `alibaba-pai`.
+* **Kolors** — `Kwai-Kolors/Kolors-ControlNet-Depth`, published by the model's own authors.
+  Kolors uses an SDXL-shaped architecture but was trained from scratch with a ChatGLM text
+  encoder, so it carries no SDXL weight lineage and none of OpenRAIL's terms; architecture
+  similarity is not licence inheritance. Thinly exercised though — the depth control has ~150
+  downloads against Qwen's thousands.
+
+Kolors also proves the point above from inside one organisation: `Kolors-ControlNet-Depth` and
+`-Canny` are tagged Apache-2.0 while `-Canny`'s sibling `Kolors-ControlNet-Pose` carries **no
+licence tag at all**, despite more downloads. One control's terms say nothing about another's,
+even under the same owner.
 
 An enumeration by model name is not sufficient to establish this, and the first pass here got
 it wrong twice: HiDream's ControlNet is published under a different org, so a name-scoped
