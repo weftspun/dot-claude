@@ -204,17 +204,27 @@ that cannot take a **depth** control cannot do the job however clean its terms a
 Stating it as a rule rather than a list, because the list keeps growing and each entry arrives
 looking attractive:
 
-* **HiDream-I1** is **MIT** — the most permissive licence of any candidate reviewed — and has
-  no ControlNet at all. A clean licence on an unconditionable model buys nothing.
-* **SANA** is Apache-2.0 throughout, ControlNets included, and the ControlNets are **HED**.
-  Edge conditioning from a render carries silhouette and internal contours with no depth
-  ordering, so it cannot express which limb is in front. For a body, limb overlap is the hard
-  part; this is the wrong signal rather than a weaker one.
+* **HiDream-I1** is **MIT** — the most permissive licence of any candidate reviewed — and its
+  only conditioning is `ControlNetLoRA/hidream-i1`: a single LoRA, not a ControlNet family,
+  under `license:other`, with 14 downloads and no likes. That fails the same way the FLUX
+  ControlNets do, on unreadable terms rather than on absence.
+* **SANA** is Apache-2.0 throughout and its ControlNet *architecture* supports depth —
+  `SanaControlNetModel` is in diffusers. **No depth checkpoint is published**: the released
+  weights are HED only. Edge conditioning from a render carries silhouette and internal
+  contours with no depth ordering, so it cannot say which limb is in front, and for a body
+  limb overlap is the hard part. This is the one candidate whose gap is *work rather than
+  terms* — the licence is clean end to end, so a depth ControlNet could be trained. Costed as
+  a training job, not adopted as-is.
 * **FLUX.1** fails a third way, below.
 
 Two clear at the time of writing: **Qwen-Image** (union plus a dedicated depth model, several
 independent maintainers) and **Z-Image-Turbo** (union, `alibaba-pai`). Both Apache-2.0 in base
 and control.
+
+An enumeration by model name is not sufficient to establish this, and the first pass here got
+it wrong twice: HiDream's ControlNet is published under a different org, so a name-scoped
+search missed it, and SANA's architecture supports depth even though its checkpoints do not.
+Search the ecosystem, then read the licence of the *control* weights, not only the base.
 
 Popularity is not the measure. Z-Image-Turbo has roughly 27x Qwen-Image's hosted run count and
 that decided nothing; conditioning did. And a hosted endpoint adds the platform's terms to the
