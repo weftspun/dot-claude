@@ -184,6 +184,7 @@ Sources excluded from corpora, with the reason:
 | posemaniacs | third-party pose scraping |
 | CC-BY-SA | share-alike exposure |
 | **OpenRAIL-M** as a *generator* | use-restrictions propagate into anything trained on the output — **passthrough use is exempt**, see below |
+| **FLUX.1** | the conditionable half is non-commercial; the permissive half cannot be conditioned — see below |
 | DeepFashion | re-export of a research-only corpus |
 | AddBiomechanics `.b3d` as an identity source | lab volunteers — narrow and inequitable population |
 | `caldata_*_jc.parquet` | pre-cut derivatives; use originals |
@@ -192,6 +193,32 @@ Sources excluded from corpora, with the reason:
 
 `O:\Documents\Datasets\cosplay_photo_library` may be used for **validation only**, never
 training.
+
+### FLUX.1: split in the wrong place
+
+The two releases fail in opposite directions, and neither half is usable for a conditioned
+corpus.
+
+**FLUX.1 [dev]** is non-commercial. That is the ordinary NC exclusion, the same class as
+Sapiens, and it needs no further argument.
+
+**FLUX.1 [schnell]** is Apache-2.0 and 4-step distilled, which reads as ideal — and it has no
+licence-clean way to be conditioned. Every FLUX ControlNet targets *[dev]*: InstantX Union,
+Shakker-Labs Union-Pro and Depth, InstantX Canny. All of them are tagged `license:other`,
+which is unreadable under the rule above, and all are trained against a non-commercial base.
+
+Loading a *[dev]* ControlNet onto *[schnell]* fails twice over. The two models differ in
+guidance behaviour, so it is not merely a licence question — and it propagates the base
+model's terms into whatever the output trains, which is the same propagation that blocks
+OpenRAIL-M as a generator.
+
+So schnell is usable for unconditioned text-to-image and unusable wherever geometry must be
+pinned, which is every corpus use this workspace has. A generator that cannot take a depth
+control is not a generator for this pipeline.
+
+Qwen-Image is the replacement and does not have this split: the base is Apache-2.0 and so are
+the ControlNets, from several independent maintainers, including a dedicated depth model
+rather than only a union.
 
 ### OpenRAIL-M: blocked as a generator, permitted as passthrough
 
@@ -223,11 +250,14 @@ Destination wins, because destination is what the restriction is about. A corpus
 way propagates OpenRAIL-M terms into a model, and after training there is nothing left to
 inspect. That closes the ANNY → ControlNet → JuggernautXL pipeline as a corpus route.
 
-Permissively licensed generators are the way through if that pipeline is wanted: FLUX.1
-[schnell] (Apache-2.0 — [dev] is non-commercial and is not), Qwen-Image (Apache-2.0),
-Lumina-Next (Apache-2.0). None is a drop-in; all are non-SDXL, so ControlNets and any ggml port
-would need redoing. Nothing about See-Through's own stack has to change, because See-Through
-does not generate.
+Permissively licensed generators are the way through if that pipeline is wanted, and the
+choice is narrower than it first appears. **Qwen-Image** (Apache-2.0) is the one that clears
+both halves: the base and its ControlNets are Apache-2.0, from several maintainers, with a
+dedicated depth model. FLUX.1 is blocklisted above for the split that makes it useless here.
+Lumina-Next is Apache-2.0 but its conditioning support has not been checked.
+
+None is a drop-in; all are non-SDXL, so ControlNets and any ggml port would need redoing.
+Nothing about See-Through's own stack has to change, because See-Through does not generate.
 
 The `anime-with-caption-cc0` entry is a **quality** exclusion, not a licensing one — the
 licence is CC0 and could not be cleaner. Hands are malformed across the set, and `handwear` is
