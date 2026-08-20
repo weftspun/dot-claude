@@ -185,6 +185,7 @@ Sources excluded from corpora, with the reason:
 | CC-BY-SA | share-alike exposure |
 | **OpenRAIL-M** as a *generator* | use-restrictions propagate into anything trained on the output — **passthrough use is exempt**, see below |
 | **FLUX.1** | the conditionable half is non-commercial; the permissive half cannot be conditioned — see below |
+| generators with no licence-clean **depth** control | HiDream-I1 (MIT, no ControlNet), SANA (Apache-2.0, HED only) — see below |
 | DeepFashion | re-export of a research-only corpus |
 | AddBiomechanics `.b3d` as an identity source | lab volunteers — narrow and inequitable population |
 | `caldata_*_jc.parquet` | pre-cut derivatives; use originals |
@@ -193,6 +194,32 @@ Sources excluded from corpora, with the reason:
 
 `O:\Documents\Datasets\cosplay_photo_library` may be used for **validation only**, never
 training.
+
+### A generator needs licence-clean depth conditioning, not just a licence
+
+The permissive licence is the easy half and it is not the deciding one. Every corpus use here
+renders an ANNY pose and requires the generated image to keep that geometry, so a generator
+that cannot take a **depth** control cannot do the job however clean its terms are.
+
+Stating it as a rule rather than a list, because the list keeps growing and each entry arrives
+looking attractive:
+
+* **HiDream-I1** is **MIT** — the most permissive licence of any candidate reviewed — and has
+  no ControlNet at all. A clean licence on an unconditionable model buys nothing.
+* **SANA** is Apache-2.0 throughout, ControlNets included, and the ControlNets are **HED**.
+  Edge conditioning from a render carries silhouette and internal contours with no depth
+  ordering, so it cannot express which limb is in front. For a body, limb overlap is the hard
+  part; this is the wrong signal rather than a weaker one.
+* **FLUX.1** fails a third way, below.
+
+Two clear at the time of writing: **Qwen-Image** (union plus a dedicated depth model, several
+independent maintainers) and **Z-Image-Turbo** (union, `alibaba-pai`). Both Apache-2.0 in base
+and control.
+
+Popularity is not the measure. Z-Image-Turbo has roughly 27x Qwen-Image's hosted run count and
+that decided nothing; conditioning did. And a hosted endpoint adds the platform's terms to the
+model's, which matters here for the same reason the OpenRAIL analysis did — restrictions
+propagate into weights, and a corpus generated through an API carries both sets.
 
 ### FLUX.1: split in the wrong place
 
