@@ -22,9 +22,19 @@ and the guards that catch them).
 
 ## Hard constraints
 
-**Compute.** GPU work runs on RunPod, never on the local desktop GPU. Tear down after use,
-then **double-check** the teardown. Anything not in a git repo is torn down after use — so
-if it matters, it is committed and pushed before the machine goes away.
+**Compute.** The local desktop GPU is available for compute. Rented GPU work runs on RunPod:
+tear down after use, then **double-check** the teardown, because anything not in a git repo
+goes with the machine — so if it matters, it is committed and pushed before teardown.
+
+The rule used to read "never on the local desktop GPU", and lifting it costs one thing worth
+naming. Teardown was not only a cost control; it was a **forcing function for committing**. A
+rented box that disappears at the end of the day makes "push before you stop" automatic. A
+local 4090 never disappears, so results can sit uncommitted on one desk indefinitely and
+nothing reports it.
+
+So the commit discipline now stands on its own rather than being enforced by the hardware
+going away: work that matters is pushed when it is produced, not when the machine is about to
+vanish.
 
 **Archive formats.** zstd, in parquet or standalone. **zip is not acceptable**, and neither
 is gzip; recompress to `.zst` and verify payload hashes before deleting an original.
