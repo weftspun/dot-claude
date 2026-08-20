@@ -1,5 +1,20 @@
 {
+  "attribution": {
+    "commit": "",
+    "pr": "",
+    "sessionUrl": false
+  },
   "permissions": {
-    "allow": []
+    "allow": [
+      "Bash(env)",
+      "Bash(echo \"--- exit $? ---\")",
+      "Read(//c/Users/ernes/.runpod/**)"
+    ],
+    "deny": [
+      "Read(//o/**)",
+      "Read(O:/**)",
+      "Read(//g/**)",
+      "Read(G:/**)"
+    ]
   }
 }
