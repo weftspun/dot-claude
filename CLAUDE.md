@@ -159,6 +159,7 @@ Sources excluded from corpora, with the reason:
 | Mixamo animation packs | licensing |
 | posemaniacs | third-party pose scraping |
 | CC-BY-SA | share-alike exposure |
+| **OpenRAIL-M** as a *generator* | use-restrictions propagate into anything trained on the output — **passthrough use is exempt**, see below |
 | DeepFashion | re-export of a research-only corpus |
 | AddBiomechanics `.b3d` as an identity source | lab volunteers — narrow and inequitable population |
 | `caldata_*_jc.parquet` | pre-cut derivatives; use originals |
@@ -167,6 +168,42 @@ Sources excluded from corpora, with the reason:
 
 `O:\Documents\Datasets\cosplay_photo_library` may be used for **validation only**, never
 training.
+
+### OpenRAIL-M: blocked as a generator, permitted as passthrough
+
+The line is what the model is *for*, not which weights it is:
+
+* **Passthrough** — the model transforms an input the user supplied and hands the result back.
+  LayerDiffuse cutting an image into layers, Marigold reading depth off a photo, LaMa filling a
+  hole. The input carries the provenance, the output goes to whoever supplied it, and the
+  restriction travels with a single artefact. **Permitted.**
+* **Generator** — the model samples new content, and that content becomes a corpus something
+  else trains on. Here the restriction does not stay with one artefact: it propagates into
+  weights, where no licence check can see it afterwards. **Blocked.**
+
+This is the same cut the synthetic-data rule already makes. A transformation of an asset we
+hold is closer to *constructed*; sampling appearance from a learned distribution and training
+on it is *generated*, with condition 1 — recorded provenance — becoming unanswerable once the
+result is inside somebody's weights.
+
+So `seethrough-ggml` is compliant. It is SDXL-derived through JuggernautXL v6 and OpenRAIL-M
+throughout, and it is passthrough by construction: See-Through takes the user's image and cuts
+it. Nothing it emits trains anything.
+
+**The case this rule does not settle, and must not be assumed either way.** Rendering an ANNY
+pose and running img2img over it is *operationally* passthrough — our own asset in, geometry
+preserved, appearance changed — but its destination is a training corpus, which is the
+generator case. Operation says permitted, destination says blocked.
+
+Destination wins, because destination is what the restriction is about. A corpus generated this
+way propagates OpenRAIL-M terms into a model, and after training there is nothing left to
+inspect. That closes the ANNY → ControlNet → JuggernautXL pipeline as a corpus route.
+
+Permissively licensed generators are the way through if that pipeline is wanted: FLUX.1
+[schnell] (Apache-2.0 — [dev] is non-commercial and is not), Qwen-Image (Apache-2.0),
+Lumina-Next (Apache-2.0). None is a drop-in; all are non-SDXL, so ControlNets and any ggml port
+would need redoing. Nothing about See-Through's own stack has to change, because See-Through
+does not generate.
 
 The `anime-with-caption-cc0` entry is a **quality** exclusion, not a licensing one — the
 licence is CC0 and could not be cleaner. Hands are malformed across the set, and `handwear` is
