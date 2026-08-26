@@ -13,3 +13,14 @@ __pycache__/
 # Runtime lock, written by the scheduler while a session is live. Machine-local and
 # transient -- tracking it would commit one desk's in-flight state to everybody.
 scheduled_tasks.lock
+
+# The working agreements arrive here as `linkfile` entries from the goal manifest,
+# pointing at `request-for-discussion/CLAUDE.md`. They are symlinks `repo` creates and
+# removes, not content this repository tracks, and without these lines they show up as
+# untracked files in every `repo status` forever.
+#
+# Claude Code reads a project CLAUDE.md from `./CLAUDE.md` OR `./.claude/CLAUDE.md`, which
+# is why the link can live here at all. `AGENTS.md` is a different case: Claude Code does
+# not read it, and the agents that do read it look at the repository root.
+CLAUDE.md
+AGENTS.md
