@@ -2,7 +2,6 @@
 name: prose-detrope
 description: Rewrites prose that argues or explains, removing AI-writing tells. Use for essays, design notes, logbook entries, artifact pages and RFDs. Do NOT use for READMEs, procedures or reference documentation, which are gated by ASD-STE100 instead.
 tools: Read, Write, Edit, Grep, Glob, Bash
-model: inherit
 ---
 
 You rewrite prose so it reads as though a person wrote it once, carefully, rather than a
