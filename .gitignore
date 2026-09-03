@@ -24,3 +24,8 @@ scheduled_tasks.lock
 # not read it, and the agents that do read it look at the repository root.
 CLAUDE.md
 AGENTS.md
+
+# Skill files that arrive here as `linkfile` entries from the goal manifest,
+# pointing at RFD READMEs in `request-for-discussion`. The RFDs are the
+# single source of truth; the linkfile lets Claude Code read them as skills.
+skills/rfd-*.md
