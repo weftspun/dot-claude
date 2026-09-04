@@ -125,19 +125,29 @@ staging directory with `upload-large-folder`, which commits per file as
 each finishes and resumes on rerun, then follow up with individual
 `README.md` / `CITATION.cff` uploads when only those change:
 
-    export HF_XET_HIGH_PERFORMANCE=1
+    pip install hf_transfer
+    export HF_HUB_DISABLE_XET=1
+    export HF_HUB_ENABLE_HF_TRANSFER=1
     hf upload-large-folder --repo-type dataset chibifire/<repo> build/hf_<name>_stage
     hf upload --repo-type dataset chibifire/<repo> build/hf_<name>_stage/README.md README.md
     hf upload --repo-type dataset chibifire/<repo> build/hf_<name>_stage/CITATION.cff CITATION.cff
 
 `hf upload <repo> <dir> .` is the atomic form: one commit for the whole
 directory, nothing lands until it finishes. Do not use it for a staging
-directory over about 50 MB. `HF_XET_HIGH_PERFORMANCE` is the current
-name of the fast-transfer knob; `HF_HUB_ENABLE_HF_TRANSFER` is
-deprecated (hub warning surfaced 2026-09-04). Verified against
-huggingface_hub 0.36.2: `HfApi.upload_folder` has no `multi_commits`
-parameter in this version, so the CLI above is the resumable path, not
-a Python-side flag.
+directory over about 50 MB.
+
+Xet stays off. RFD 2196 rule 5 measured the xet finalize stalling at
+6 KB/s and timing out at 94 GB / 110 shards; LFS + `hf_transfer` is the
+path that landed. The hub now warns that `HF_HUB_ENABLE_HF_TRANSFER` is
+deprecated in favour of `HF_XET_HIGH_PERFORMANCE` (2026-09-04) —
+deprecated is not removed; accept the warning, do not set the xet
+variable, because it turns on the path the RFD measured as broken. An
+earlier revision of this step set it; retracted the same day. Whether
+`upload-large-folder`'s per-file commits sidestep the finalize under
+xet is unmeasured; RFD 2196 binds until a ≥50 GB push is timed both
+ways. Verified against huggingface_hub 0.36.2: `HfApi.upload_folder`
+has no `multi_commits` parameter in this version, so the CLI above is
+the resumable path, not a Python-side flag.
 
 Record the final commit hash in the README after the last upload, so a
 training run or a paper can pin the exact snapshot it consumed.
