@@ -118,13 +118,29 @@ not `maskscore_speech.parquet`). Missing subdirectory prefix is exactly
 the failure mode that made `chibifire/maskscore-rung-1-bootstrap`'s
 speech configs not surface until we fixed the README.
 
-**4. Upload.** Use `hf` (the HF CLI). Upload the whole staging directory
-first, then follow up with individual `README.md` / `CITATION.cff`
-updates when only those change:
+**4. Upload, incrementally.** Use `hf` (the HF CLI). The upload must
+survive a dropped connection or a killed session: bytes already sent
+land as commits, and a rerun resumes rather than restarting. Upload the
+staging directory with `upload-large-folder`, which commits per file as
+each finishes and resumes on rerun, then follow up with individual
+`README.md` / `CITATION.cff` uploads when only those change:
 
-    hf upload --repo-type dataset chibifire/<repo> build/hf_<name>_stage .
+    export HF_XET_HIGH_PERFORMANCE=1
+    hf upload-large-folder --repo-type dataset chibifire/<repo> build/hf_<name>_stage
     hf upload --repo-type dataset chibifire/<repo> build/hf_<name>_stage/README.md README.md
     hf upload --repo-type dataset chibifire/<repo> build/hf_<name>_stage/CITATION.cff CITATION.cff
+
+`hf upload <repo> <dir> .` is the atomic form: one commit for the whole
+directory, nothing lands until it finishes. Do not use it for a staging
+directory over about 50 MB. `HF_XET_HIGH_PERFORMANCE` is the current
+name of the fast-transfer knob; `HF_HUB_ENABLE_HF_TRANSFER` is
+deprecated (hub warning surfaced 2026-09-04). Verified against
+huggingface_hub 0.36.2: `HfApi.upload_folder` has no `multi_commits`
+parameter in this version, so the CLI above is the resumable path, not
+a Python-side flag.
+
+Record the final commit hash in the README after the last upload, so a
+training run or a paper can pin the exact snapshot it consumed.
 
 **5. Verify from the dataset viewer.** Open
 `https://huggingface.co/datasets/chibifire/<repo>` and confirm each new
@@ -140,4 +156,6 @@ upload.
 - **The README `configs:` block is the source of truth for the dataset viewer**, not the parquet layout on disk. A parquet uploaded to a subdirectory that no config points at renders as nothing. Silent skip that reads exactly like a pass — rule 3.
 - **Version the CITATION.cff by RFD serial** (`version: RFD-2164.5`) not by a semver invented on the spot. The RFD is the release; the file cites it.
 - **`hf upload` never rewrites what it did not upload.** A first pass with the full staging directory is fine; a second pass with only `README.md` will not delete a stray file, so the staging directory is the reference — not the state on HF.
+- **The upload is incremental or it is a liability.** `hf upload-large-folder` commits per file and resumes; `hf upload <dir> .` is one atomic commit that costs the same bytes twice on any drop. A multi-GB corpus render or a checkpoint goes through the resumable form every time; the atomic form is for a README.
+- **Pin the snapshot.** The final commit hash goes in the README. A dataset consumed by a training run whose commit cannot be named afterwards is a training run that cannot be reproduced.
 - **Related skills**: [[emit-etnf-maskscore-stub]] for what to put in the parquets, [[register-rfd-under-pen-oid]] for the serial cited in `version:` and `identifiers:`.
