@@ -142,6 +142,47 @@ layer construction on intermediate cuts (raw NLD tensors trigger
 `IndexError: list index out of range` at the output boundary, which
 looks like a real failure but is a probe-methodology artefact).
 
+## Norm-layer node counts when a recipe asserts a specific placement
+
+Some target recipes assert that a specific normalization op lives in a
+specific part of the graph. Hailo's vit_base_bn recipe asserts every
+encoder Norm is BatchNormalization; the recipe's DFC-parseability rests
+on that assertion. A plain `PARSE OK` on such an incoming ONNX is not
+enough — a BN-vs-LN node count says whether the recipe held.
+
+Count both op types and slice by name-prefix for the region under the
+assertion:
+
+```python
+import onnx, collections
+m = onnx.load('/work/probe/model.onnx')
+prefix = '/backbone/'   # or whatever the recipe scopes
+ops = collections.Counter(
+    n.op_type for n in m.graph.node
+    if n.name and n.name.startswith(prefix)
+)
+bn = ops.get('BatchNormalization', 0)
+ln = ops.get('LayerNormalization', 0)
+print(f'{prefix}: BatchNormalization={bn}, LayerNormalization={ln}')
+```
+
+Reads for a vit_base_bn-recipe incoming ONNX:
+
+- `BN > 0, LN == 0` in the encoder: recipe held, arch amendment
+  landed. Compat probe verdict is a full pass.
+- `BN > 0, LN > 0` in the encoder: recipe partial. Retrain kept
+  some old LN shapes somewhere (a subgraph the amendment missed).
+  Reads as a **recipe failure, not a probe failure**. Report the
+  specific LN node names so the retrain can be corrected.
+- `BN == 0, LN > 0` in the encoder: recipe not applied at all.
+  Probe should still run the DFC parse, and the parse will surface
+  the earlier `channels is not in list` / `IndexError` at
+  `_convert_axes_to_nhwc` — that error's presence on a recipe-asserted
+  BN ONNX is the same recipe-failure signal by a different path.
+
+The same shape applies to any recipe that swaps one norm for another:
+run the count, name the region, report which nodes escaped the swap.
+
 ## Gotchas
 
 - `end_node_names` takes **node** names (`NodeProto.name`), not tensor
